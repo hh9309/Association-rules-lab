@@ -57,7 +57,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const tabs: { id: LabTab; name: string; num: string; icon: React.ReactNode }[] = [
     { id: 'algebra', name: '理论代数', num: '1', icon: <Binary className="w-3.5 h-3.5" /> },
-    { id: 'apriori', name: 'Apriori 3D', num: '2', icon: <Box className="w-3.5 h-3.5" /> },
+    { id: 'apriori', name: 'Apriori 2D', num: '2', icon: <Box className="w-3.5 h-3.5" /> },
     { id: 'fptree', name: 'FP-Tree 树图', num: '3', icon: <GitFork className="w-3.5 h-3.5" /> },
     { id: 'eclat', name: 'ECLAT 垂直', num: '4', icon: <Network className="w-3.5 h-3.5" /> },
     { id: 'cases', name: '四大案例', num: '5', icon: <Layers className="w-3.5 h-3.5" /> },
@@ -87,7 +87,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </span>
             </div>
             <p className="text-[12px] text-stone-500 leading-tight">
-              0-1 矩阵形式化 · 3D 剪枝 · FP 树图 · 垂直倒排求交 · 规则评估
+              0-1 矩阵形式化 · 2D 逐层剪枝 · FP 树图 · 垂直倒排求交 · 规则评估
             </p>
           </div>
         </div>

@@ -8,6 +8,8 @@ export interface Lattice3DNode {
   x: number;
   y: number;
   z: number;
+  x2d?: number;
+  y2d?: number;
   vx?: number;
   vy?: number;
   vz?: number;
@@ -15,6 +17,7 @@ export interface Lattice3DNode {
   support: number;
   status: 'frequent' | 'pruned_by_property' | 'pruned_by_cutoff' | 'candidate' | 'unvisited';
   pruneReason?: string;
+  subsets?: { items: string[]; isFrequent: boolean; name: string }[];
 }
 
 export interface Lattice3DEdge {
@@ -185,7 +188,7 @@ export function runAprioriStages(
     currentK++;
   }
 
-  // Construct 3D Lattice Graph for spatial display
+  // Construct Lattice Graph for 2D & 3D display
   // Base Level 0 (Empty set)
   latticeNodeMap.set('ROOT', {
     id: 'ROOT',
@@ -194,6 +197,8 @@ export function runAprioriStages(
     x: 0,
     y: 180,
     z: 0,
+    x2d: 0,
+    y2d: 40,
     count: n,
     support: 1.0,
     status: 'frequent',
@@ -203,18 +208,42 @@ export function runAprioriStages(
     const k = stage.k;
     const candidates = stage.candidates;
     const countOnLevel = candidates.length;
-    const y = 180 - k * 110; // each layer down or up
+    const y = 180 - k * 110; // 3D layer
     const radius = Math.min(220, 60 + countOnLevel * 18);
+
+    // 2D Coordinates: clean horizontal distribution across layered tiers
+    const y2d = 40 + k * 140;
+    const nodeSpacing2d = Math.max(120, Math.min(190, 960 / Math.max(countOnLevel, 1)));
+    const totalWidth2d = (countOnLevel - 1) * nodeSpacing2d;
+    const startX2d = -totalWidth2d / 2;
 
     candidates.forEach((cand, idx) => {
       const angle = (idx / Math.max(countOnLevel, 1)) * Math.PI * 2;
       const x = Math.cos(angle) * radius;
       const z = Math.sin(angle) * radius;
-      const id = cand.items.join('::');
+      const id = cand.items.slice().sort().join('::');
+
+      const x2d = startX2d + idx * nodeSpacing2d;
 
       let status: Lattice3DNode['status'] = 'frequent';
       if (cand.prunedByApriori) status = 'pruned_by_property';
       else if (!cand.isFrequent) status = 'pruned_by_cutoff';
+
+      // Record (k-1) subsets and frequent verification
+      const subsets =
+        k > 1
+          ? cand.items.map((_, skipIdx) => {
+              const sub = cand.items.filter((_, i) => i !== skipIdx).sort();
+              const subId = sub.join('::');
+              const parentNode = latticeNodeMap.get(subId);
+              const isFreq = parentNode ? parentNode.status === 'frequent' : false;
+              return {
+                items: sub,
+                name: sub.join('·'),
+                isFrequent: isFreq,
+              };
+            })
+          : undefined;
 
       latticeNodeMap.set(id, {
         id,
@@ -223,10 +252,13 @@ export function runAprioriStages(
         x,
         y,
         z,
+        x2d,
+        y2d,
         count: cand.count,
         support: cand.support,
         status,
         pruneReason: cand.pruneReason,
+        subsets,
       });
 
       // Connect to L0 if k=1

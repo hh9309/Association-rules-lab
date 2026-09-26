@@ -3,6 +3,7 @@ import { Transaction, DatasetCase, AssociationRule } from '../types';
 import { buildBinaryMatrix } from '../algorithms/core';
 import { runAprioriStages } from '../algorithms/apriori';
 import { extractAssociationRules } from '../algorithms/rules';
+import { RuleGenerationEngine } from './RuleGenerationEngine';
 import { 
   Workflow, 
   ArrowRight, 
@@ -14,7 +15,10 @@ import {
   TrendingUp, 
   Filter,
   CheckCircle2,
-  FileText
+  FileText,
+  Sparkles,
+  Table as TableIcon,
+  Zap
 } from 'lucide-react';
 
 interface PipelineModuleProps {
@@ -39,6 +43,7 @@ export const PipelineModule: React.FC<PipelineModuleProps> = ({
   onGoToReport,
 }) => {
   const [currentStep, setCurrentStep] = useState<number>(1);
+  const [step4View, setStep4View] = useState<'anim' | 'table'>('anim');
   const [minLiftFilter, setMinLiftFilter] = useState<number>(1.2);
   const [hoveredRule, setHoveredRule] = useState<AssociationRule | null>(null);
 
@@ -63,7 +68,7 @@ export const PipelineModule: React.FC<PipelineModuleProps> = ({
     { num: 1, title: '原始交易数据', desc: '长表交易明细与词汇项集' },
     { num: 2, title: '0-1 哑变量转化', desc: '独热二值特征矩阵' },
     { num: 3, title: '频繁项集提取', desc: '先验剪枝与支持度截断' },
-    { num: 4, title: '关联规则推导', desc: '置信度与提升度多维计算' },
+    { num: 4, title: '关联规则生成', desc: '从频繁项集到规则生成动画' },
     { num: 5, title: '指标散点分布', desc: '支持度 vs 置信度 vs Lift' },
     { num: 6, title: '商业决策看板', desc: '捆绑策略与价值转化' },
   ];
@@ -288,70 +293,142 @@ export const PipelineModule: React.FC<PipelineModuleProps> = ({
                 );
               })}
             </div>
+
+            {/* Seamless Transition to Rule Generation */}
+            <div className="p-3.5 bg-teal-50/80 border border-teal-200 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+              <div className="text-xs text-teal-950">
+                <span className="font-bold flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-teal-700" />
+                  <span>频繁项集提取完毕！</span>
+                </span>
+                <p className="text-teal-800 text-[11px] mt-0.5">
+                  已产出 {aprioriData.allFrequent.filter((f) => f.items.length >= 2).length} 个可用于拆解关联规则的高阶频繁项集（k ≥ 2），可直接进入第四步体验规则生成全过程动画。
+                </p>
+              </div>
+              <button
+                onClick={() => setCurrentStep(4)}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-700 hover:bg-teal-800 text-white rounded text-xs font-medium cursor-pointer transition-colors shadow-xs shrink-0"
+              >
+                <span>下一步：规则生成推导动画</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         )}
 
-        {/* Step 4: Rules Extraction */}
+        {/* Step 4: Rules Generation & Animation */}
         {currentStep === 4 && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
+          <div className="space-y-5">
+            {/* Step 4 Sub-View Switcher Header */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-stone-100">
               <div>
-                <h3 className="text-sm font-semibold text-stone-900">
-                  第四步：生成关联规则与多指标筛选 (Association Rules Generation)
+                <h3 className="text-sm font-semibold text-stone-900 flex items-center gap-2">
+                  <span>第四步：从频繁项集到关联规则生成</span>
+                  <span className="text-[11px] font-normal text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                    全过程推导与动态剪枝
+                  </span>
                 </h3>
                 <p className="text-xs text-stone-500 mt-0.5">
-                  以最小置信度 {(minConf * 100).toFixed(0)}% 和最小提升度 {minLiftFilter.toFixed(1)} 过滤强规则。
+                  以最小置信度 {(minConf * 100).toFixed(0)}% 和最小提升度 {minLiftFilter.toFixed(1)} 过滤强关联规则。
                 </p>
               </div>
-              <div className="flex items-center gap-3 text-xs">
-                <span className="text-stone-500">Min Lift 过滤:</span>
-                <input
-                  type="range"
-                  min="0.8"
-                  max="2.5"
-                  step="0.1"
-                  value={minLiftFilter}
-                  onChange={(e) => setMinLiftFilter(parseFloat(e.target.value))}
-                  className="w-20 accent-teal-700 cursor-pointer"
-                />
-                <span className="font-mono font-bold text-teal-800">{minLiftFilter.toFixed(1)}</span>
+
+              {/* Sub-view Toggle */}
+              <div className="flex items-center gap-1.5 bg-stone-100 p-1 rounded-md text-xs">
+                <button
+                  onClick={() => setStep4View('anim')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded transition-all cursor-pointer ${
+                    step4View === 'anim'
+                      ? 'bg-white text-stone-900 font-semibold shadow-xs'
+                      : 'text-stone-600 hover:text-stone-900'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-teal-600" />
+                  <span>🎬 规则生成全过程动画</span>
+                </button>
+                <button
+                  onClick={() => setStep4View('table')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded transition-all cursor-pointer ${
+                    step4View === 'table'
+                      ? 'bg-white text-stone-900 font-semibold shadow-xs'
+                      : 'text-stone-600 hover:text-stone-900'
+                  }`}
+                >
+                  <TableIcon className="w-3.5 h-3.5 text-teal-600" />
+                  <span>📋 全量关联规则明细表</span>
+                </button>
               </div>
             </div>
 
-            <div className="overflow-x-auto border border-stone-100 rounded max-h-[260px] overflow-y-auto">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead className="bg-stone-50 text-[11px] font-mono text-stone-600 sticky top-0">
-                  <tr>
-                    <th className="p-2 border-b border-stone-200">规则 ID</th>
-                    <th className="p-2 border-b border-stone-200">前项 Antecedent ⇒ 后项 Consequent</th>
-                    <th className="p-2 border-b border-stone-200 text-right">支持度</th>
-                    <th className="p-2 border-b border-stone-200 text-right">置信度</th>
-                    <th className="p-2 border-b border-stone-200 text-right">提升度 Lift</th>
-                    <th className="p-2 border-b border-stone-200 text-right">确信度 Conv</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-100 font-mono text-xs">
-                  {filteredRules.slice(0, 10).map((r) => (
-                    <tr key={r.id} className="hover:bg-stone-50/70">
-                      <td className="p-2 font-bold text-stone-700">{r.id}</td>
-                      <td className="p-2 font-sans font-medium text-stone-900">
-                        [{r.antecedent.map((it) => it.split(' ')[0]).join(' + ')}] ⇒ [{r.consequent.map((it) => it.split(' ')[0]).join(' + ')}]
-                      </td>
-                      <td className="p-2 text-right text-stone-600">{(r.support * 100).toFixed(1)}%</td>
-                      <td className="p-2 text-right font-bold text-teal-800">{(r.confidence * 100).toFixed(1)}%</td>
-                      <td className="p-2 text-right">
-                        <span className="px-1.5 py-0.5 rounded bg-teal-50 text-teal-900 font-bold">
-                          {r.lift.toFixed(2)}
-                        </span>
-                      </td>
-                      <td className="p-2 text-right text-stone-500">
-                        {r.conviction > 100 ? '∞' : r.conviction.toFixed(2)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {/* View A: Interactive Rule Generation Animation Engine */}
+            {step4View === 'anim' && (
+              <RuleGenerationEngine
+                frequentItemsets={aprioriData.allFrequent}
+                transactions={transactions}
+                minConf={minConf}
+                setMinConf={setMinConf}
+                minLift={minLiftFilter}
+              />
+            )}
+
+            {/* View B: Full Rules Matrix Table */}
+            {step4View === 'table' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs text-stone-600 font-medium">
+                    当前筛选出 <span className="text-teal-800 font-bold">{filteredRules.length}</span> 条强关联规则 (Lift ≥ {minLiftFilter.toFixed(1)})
+                  </div>
+                  <div className="flex items-center gap-3 text-xs">
+                    <span className="text-stone-500">Min Lift 过滤滑块:</span>
+                    <input
+                      type="range"
+                      min="0.8"
+                      max="2.5"
+                      step="0.1"
+                      value={minLiftFilter}
+                      onChange={(e) => setMinLiftFilter(parseFloat(e.target.value))}
+                      className="w-24 accent-teal-700 cursor-pointer"
+                    />
+                    <span className="font-mono font-bold text-teal-800">{minLiftFilter.toFixed(1)}</span>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto border border-stone-200 rounded-lg max-h-[360px] overflow-y-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead className="bg-stone-50 text-[11px] font-mono text-stone-600 sticky top-0 border-b border-stone-200 z-10">
+                      <tr>
+                        <th className="p-2.5">规则 ID</th>
+                        <th className="p-2.5">前项 Antecedent ⇒ 后项 Consequent</th>
+                        <th className="p-2.5 text-right">支持度 Supp</th>
+                        <th className="p-2.5 text-right">置信度 Conf</th>
+                        <th className="p-2.5 text-right">提升度 Lift</th>
+                        <th className="p-2.5 text-right">确信度 Conv</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-stone-100 font-mono text-xs">
+                      {filteredRules.map((r) => (
+                        <tr key={r.id} className="hover:bg-stone-50/70 transition-colors">
+                          <td className="p-2.5 font-bold text-stone-700">{r.id}</td>
+                          <td className="p-2.5 font-sans font-medium text-stone-900">
+                            [{r.antecedent.map((it) => it.split(' ')[0]).join(' + ')}] ⇒ [{r.consequent.map((it) => it.split(' ')[0]).join(' + ')}]
+                          </td>
+                          <td className="p-2.5 text-right text-stone-600">{(r.support * 100).toFixed(1)}%</td>
+                          <td className="p-2.5 text-right font-bold text-teal-800">{(r.confidence * 100).toFixed(1)}%</td>
+                          <td className="p-2.5 text-right">
+                            <span className="px-1.5 py-0.5 rounded bg-teal-50 text-teal-900 font-bold border border-teal-200">
+                              {r.lift.toFixed(2)}x
+                            </span>
+                          </td>
+                          <td className="p-2.5 text-right text-stone-500">
+                            {r.conviction > 100 ? '∞' : r.conviction.toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

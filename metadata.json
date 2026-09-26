@@ -1,6 +1,6 @@
 {
   "name": "频繁项集与关联分析实验室 (Association Rules Lab)",
-  "description": "交互式频繁项集与关联分析挖掘实验室，涵盖理论代数推导、Apriori 3D 逐层剪枝、FP-Tree 树图构建与路径切割、ECLAT 垂直数据演播、四大经典案例、Python/Mlxtend 代码引擎、AI 随诊对话及全流程挖掘报告系统。",
+  "description": "交互式频繁项集与关联分析挖掘实验室，涵盖理论代数推导、Apriori 2D 逐层剪枝、FP-Tree 树图构建与路径切割、ECLAT 垂直数据演播、四大经典案例、Python/Mlxtend 代码引擎、AI 随诊对话及全流程挖掘报告系统。",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

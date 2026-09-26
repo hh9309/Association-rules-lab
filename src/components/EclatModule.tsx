@@ -105,18 +105,18 @@ export const EclatModule: React.FC<EclatModuleProps> = ({
           const px = src.x + (tgt.x - src.x) * particleOffset;
           const py = src.y + (tgt.y - src.y) * particleOffset;
 
-          const grad = ctx.createRadialGradient(px, py, 1, px, py, 6);
+          const grad = ctx.createRadialGradient(px, py, 1, px, py, 4.5);
           grad.addColorStop(0, '#14B8A6');
           grad.addColorStop(1, 'rgba(20, 184, 166, 0)');
 
           ctx.fillStyle = grad;
           ctx.beginPath();
-          ctx.arc(px, py, 6, 0, Math.PI * 2);
+          ctx.arc(px, py, 4.5, 0, Math.PI * 2);
           ctx.fill();
 
           ctx.fillStyle = '#FFFFFF';
           ctx.beginPath();
-          ctx.arc(px, py, 2, 0, Math.PI * 2);
+          ctx.arc(px, py, 1.5, 0, Math.PI * 2);
           ctx.fill();
         }
 
@@ -134,16 +134,16 @@ export const EclatModule: React.FC<EclatModuleProps> = ({
         ctx.fillStyle = isSelected ? '#0D9488' : '#1E293B';
         ctx.fill();
         ctx.strokeStyle = isSelected ? '#042F2E' : '#64748B';
-        ctx.lineWidth = isSelected ? 3 : 1.5;
+        ctx.lineWidth = isSelected ? 2.5 : 1.2;
         ctx.stroke();
 
         ctx.restore();
 
         // Node Label
         ctx.fillStyle = '#0F172A';
-        ctx.font = 'bold 10px sans-serif';
+        ctx.font = 'bold 9.5px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(node.name.split(' ')[0], node.x, node.y - node.radius - 4);
+        ctx.fillText(node.name.split(' ')[0], node.x, node.y - node.radius - 3);
       });
 
       animationFrameId = requestAnimationFrame(render);
@@ -167,7 +167,7 @@ export const EclatModule: React.FC<EclatModuleProps> = ({
     let hit: NetworkNode | null = null;
     for (const node of networkData.nodes) {
       const dist = Math.hypot(node.x - x, node.y - y);
-      if (dist <= node.radius + 4) {
+      if (dist <= node.radius + 6) {
         hit = node;
         break;
       }

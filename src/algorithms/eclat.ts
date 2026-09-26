@@ -147,7 +147,7 @@ export function generateAssociationNetwork(
       name: item,
       x,
       y,
-      radius: Math.min(28, Math.max(16, 14 + degree * 2.5)),
+      radius: Math.min(19, Math.max(11, Math.round((14 + degree * 2.5) * (2 / 3)))),
       support: 0.5,
       degree,
     };

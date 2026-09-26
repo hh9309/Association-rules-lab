@@ -14,7 +14,7 @@ import { Navbar, LabTab } from './components/Navbar';
 
 // 10 Modules
 import { AlgebraModule } from './components/AlgebraModule';
-import { Apriori3DModule } from './components/Apriori3DModule';
+import { Apriori2DModule } from './components/Apriori2DModule';
 import { FPTreeModule } from './components/FPTreeModule';
 import { EclatModule } from './components/EclatModule';
 import { CasesModule } from './components/CasesModule';
@@ -133,7 +133,7 @@ export default function App() {
         )}
 
         {activeTab === 'apriori' && (
-          <Apriori3DModule
+          <Apriori2DModule
             currentCase={currentCase}
             transactions={activeTransactions}
             minSup={minSup}

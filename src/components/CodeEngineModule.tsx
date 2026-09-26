@@ -38,7 +38,6 @@ export const CodeEngineModule: React.FC<CodeEngineModuleProps> = ({
 }) => {
   const [activeCodeTab, setActiveCodeTab] = useState<'mlxtend' | 'numpy_scratch' | 'pure_python'>('mlxtend');
   const [copied, setCopied] = useState<boolean>(false);
-  const [copiedPip, setCopiedPip] = useState<boolean>(false);
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [hasRun, setHasRun] = useState<boolean>(false);
   const [executionTime, setExecutionTime] = useState<number | null>(null);
@@ -811,50 +810,6 @@ ${
               <span>下载 .py 脚本</span>
             </button>
           </div>
-        </div>
-      </div>
-
-      {/* Environment & Error Troubleshooting Card */}
-      <div className="bg-amber-50/80 border border-amber-200/90 rounded-lg p-3.5 text-xs text-amber-950 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-xs">
-        <div className="flex items-start gap-2.5">
-          <div className="w-5 h-5 rounded-full bg-amber-200/80 flex items-center justify-center text-amber-800 text-[11px] font-bold shrink-0 mt-0.5">
-            !
-          </div>
-          <div>
-            <div className="font-semibold text-stone-900 flex items-center gap-1.5 flex-wrap">
-              <span>本地运行报</span>
-              <code className="bg-amber-200/60 text-amber-950 px-1.5 py-0.5 rounded font-mono text-[11px] font-bold">
-                ModuleNotFoundError: No module named 'mlxtend'
-              </code>
-              <span>？</span>
-            </div>
-            <p className="text-amber-900 text-[11px] mt-1 leading-relaxed">
-              <strong>原因</strong>：原生 Python 默认不包含 <code>mlxtend</code> 挖掘库。
-              <strong>现已为代码注入三大自动保障</strong>：① 脚本开头自带<strong>静默检测与自动 pip 安装</strong>；② 下方提供<strong>国内镜像一键安装命令</strong>；③ 或者直接点击切换到<strong>「3. 纯原生 Python 零依赖」</strong>标签页，免装任何库直接跑出直方图与规则表！
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 shrink-0 flex-wrap">
-          <button
-            onClick={() => {
-              navigator.clipboard.writeText("pip install mlxtend pandas matplotlib -i https://pypi.tuna.tsinghua.edu.cn/simple");
-              setCopiedPip(true);
-              setTimeout(() => setCopiedPip(false), 2000);
-            }}
-            className="flex items-center gap-1 px-3 py-1.5 bg-amber-700 hover:bg-amber-800 text-white rounded text-xs font-mono transition-colors shadow-xs cursor-pointer"
-            title="复制国内清华镜像极速安装命令"
-          >
-            {copiedPip ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copiedPip ? '已复制 pip 命令' : '复制清华源 pip 安装命令'}</span>
-          </button>
-          <button
-            onClick={() => setActiveCodeTab('pure_python')}
-            className="flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-amber-100 border border-amber-300 text-amber-900 rounded text-xs font-medium transition-colors cursor-pointer"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-            <span>切换至免安装零依赖内核</span>
-          </button>
         </div>
       </div>
 
